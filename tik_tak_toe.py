@@ -41,3 +41,36 @@ class TicTacToe:
     def switch_player(self):
         """Switch the current player between 'X' and 'O'."""
         self.current_player = 'O' if self.current_player == 'X' else 'X'
+
+    def play(self):
+        #Main game loop.
+        while True:
+                    self.print_board()
+                    print(f"Player {self.current_player}'s turn")
+                    try:
+                        r, c = map(int, input("Enter row and column (0-2) separated by space: ").split())
+                        if r not in range(3) or c not in range(3):
+                            print("Invalid input. Please enter row and column values between 0 and 2.")
+                            continue
+                    except ValueError:
+                        print("Invalid input. Please enter valid numbers.")
+                        continue
+
+                    if not self.makeMove(r, c):
+                        print("Cell already taken, try again.")
+                        continue
+
+                    # Check for a winner
+                    if self.is_winner(self.current_player):
+                        self.print_board()
+                        print(f"Player {self.current_player} wins!")
+                        break
+
+                    # Check if the board is full (a draw)
+                    if self.isTheTableFull():
+                        self.print_board()
+                        print("It's a draw!")
+                        break
+
+                    # Switch players
+                    self.switch_player()
