@@ -74,3 +74,8 @@ class TicTacToe:
 
                     # Switch players
                     self.switch_player()
+
+# Run the game
+if __name__ == "__main__":
+    game = TicTacToe()
+    game.play()
