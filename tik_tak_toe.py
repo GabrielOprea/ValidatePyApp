@@ -22,3 +22,18 @@ class TicTacToe:
             all([self.board[i][2 - i] == player for i in range(3)]):
             return True
         return False
+    
+    def isTheTableFull(self):
+        #Check if the board is full.
+        # This should return a bool
+        # This bool should tell us
+        # If the game is ended
+        # Or maybe not
+        return all([gameCell != ' ' for gameRow in self.board for gameCell in gameRow])
+
+    def makeMove(self, gameRow, gameColumn):
+            if self.board[gameRow][gameColumn] == ' ':
+                        #Place a move on the board.
+                self.board[gameRow][gameColumn] = self.current_player
+                return True
+            return False
