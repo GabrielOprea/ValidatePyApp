@@ -1,0 +1,91 @@
+name: Anomaly Detection
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  fingerprint-anomalies:
+    runs-on: ubuntu-latest
+    env:
+      COMPLEXITY_WEIGHT: ${{ vars.COMPLEXITY_WEIGHT }}
+      EXTERNAL_DEPENDENCIES_WEIGHT: ${{ vars.EXTERNAL_DEPENDENCIES_WEIGHT }}
+      FINGERPRINT_THRESHOLD: ${{ vars.FINGERPRINT_THRESHOLD }}
+      FREQUENCY_WEIGHT: ${{ vars.FREQUENCY_WEIGHT }}
+      REPO_PATH: ${{ vars.REPO_PATH }}
+      REPO_URL: ${{ vars.REPO_URL }}
+      RISK_THRESHOLD: ${{ vars.RISK_THRESHOLD }}
+      SENSITIVE_DATA_WEIGHT: ${{ vars.SENSITIVE_DATA_WEIGHT }}
+      SCALING_FACTOR: ${{vars.SCALING_FACTOR}}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v3
+        with:
+          python-version: 3.13.1
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run fingerprint anomaly detection
+        run: |
+          cd pipeline
+          python fingerprint_pipeline.py
+        
+  risk-score-anomalies:
+    needs: fingerprint-anomalies
+    runs-on: ubuntu-latest
+    env:
+      COMPLEXITY_WEIGHT: ${{ vars.COMPLEXITY_WEIGHT }}
+      EXTERNAL_DEPENDENCIES_WEIGHT: ${{ vars.EXTERNAL_DEPENDENCIES_WEIGHT }}
+      FINGERPRINT_THRESHOLD: ${{ vars.FINGERPRINT_THRESHOLD }}
+      FREQUENCY_WEIGHT: ${{ vars.FREQUENCY_WEIGHT }}
+      REPO_PATH: ${{ vars.REPO_PATH }}
+      REPO_URL: ${{ vars.REPO_URL }}
+      RISK_THRESHOLD: ${{ vars.RISK_THRESHOLD }}
+      SENSITIVE_DATA_WEIGHT: ${{ vars.SENSITIVE_DATA_WEIGHT }}
+      SCALING_FACTOR: ${{vars.SCALING_FACTOR}}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v3
+        with:
+          python-version: 3.13.1
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run risk score anomaly detection
+        run: |
+          cd pipeline
+          python risk_score_pipeline.py
+
+  manual-approval:
+    needs: [fingerprint-anomalies, risk-score-anomalies]
+    if: failure()
+    environment: manual-approval
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Await manual approval
+        run: echo "Anomaly detected. Waiting for manual approval before proceeding."
+
+  finalize:
+    needs: [fingerprint-anomalies, risk-score-anomalies, manual-approval]
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Finalize the process
+        run: echo "Pipeline complete!"
