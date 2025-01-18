@@ -30,5 +30,11 @@ class Calculator:
         """Returns a raised to the power of b."""
         return a ** b
     
+    def square_root(self, a):
+        """Returns the square root of a. Raises an error if the value is negative."""
+        if a < 0:
+            raise ValueError("Cannot take the square root of a negative number")
+        return a ** 0.5
+    
 calc = Calculator()
 print(calc.diVide(4, 2))
