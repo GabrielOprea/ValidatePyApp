@@ -26,5 +26,9 @@ class Calculator:
                     raise ValueError("Cannot divide by zero")
                 return the_var_to_be_divided / someVarFor_diViding
     
+    def power(self, a, b):
+        """Returns a raised to the power of b."""
+        return a ** b
+    
 calc = Calculator()
 print(calc.diVide(4, 2))
